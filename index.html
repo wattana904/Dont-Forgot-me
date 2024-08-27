@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <title>Dont'Forgot me</title>
+    <link rel="website icon"type="png" href="image.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List พร้อมระบบแจ้งเตือน</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url(66cda0030c837.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="text"], input[type="datetime-local"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>To-Do List</h1>
+        <input type="text" id="taskInput" placeholder="เพิ่มงาน...">
+        <input type="datetime-local" id="taskTime">
+        <button onclick="addTask()">เพิ่มงาน</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // ขออนุญาตใช้ Notification API
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        function addTask() {
+            var taskInput = document.getElementById("taskInput");
+            var taskTime = document.getElementById("taskTime").value;
+            var taskValue = taskInput.value;
+
+            if (taskValue === "" || taskTime === "") {
+                alert("กรุณาใส่ข้อความและเวลาที่ต้องการแจ้งเตือน");
+                return;
+            }
+
+            var li = document.createElement("li");
+            li.textContent = `${taskValue} - ${new Date(taskTime).toLocaleString()}`;
+
+            var removeButton = document.createElement("button");
+            removeButton.textContent = "ลบ";
+            removeButton.className = "remove";
+            removeButton.onclick = function() {
+                var li = this.parentNode;
+                li.parentNode.removeChild(li);
+            };
+
+            li.appendChild(removeButton);
+            document.getElementById("taskList").appendChild(li);
+
+            // ตั้งค่าแจ้งเตือน
+            var taskTimestamp = new Date(taskTime).getTime();
+            var now = new Date().getTime();
+            var timeToAlert = taskTimestamp - now;
+
+            if (timeToAlert > 0) {
+                setTimeout(function() {
+                    // ส่งแจ้งเตือนผ่าน Notification API
+                    if (Notification.permission === "granted") {
+                        var notification = new Notification("ถึงเวลาทำงาน", {
+                            body: taskValue,
+                            icon: "image.png"
+                        });
+                    }
+
+                    // เล่นเสียงแจ้งเตือน
+                    var audio = new Audio("level-up-191997.mp3");
+                    audio.play();
+
+                }, timeToAlert);
+            }
+
+            taskInput.value = "";
+            document.getElementById("taskTime").value = "";
+        }
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+            
+    </script>
+</body>
+</html>
